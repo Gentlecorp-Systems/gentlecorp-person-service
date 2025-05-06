@@ -2,22 +2,37 @@ package com.gentlecorp.person.models.events;
 
 import com.gentlecorp.person.models.entities.Person;
 
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.Map;
 
 public record SendMailEvent(
     String email,
-    UUID id,
-    String firstName,
-    String lastName,
-    String roles
+    Map<String, String> placeholders
 ) {
-    public static SendMailEvent fromEntity(final Person person, final String role) {
+    public static SendMailEvent toCreateEvent(final Person person, final String role) {
         return new SendMailEvent(
             person.getEmail(),
-            person.getId(),
-            person.getFirstName(),
-            person.getLastName(),
-            role
+            Map.of(
+                "id", person.getId().toString(),
+                "firstName", person.getFirstName(),
+                "lastName", person.getLastName(),
+                "role", role,
+                "accountId", "n/a",
+                "cartItemCount", "n/a"
+            )
+        );
+    }
+
+    public static SendMailEvent toDeleteEvent(final Person person) {
+        return new SendMailEvent(
+            person.getEmail(),
+            Map.of(
+                "id", person.getId().toString(),
+                "firstName", person.getFirstName(),
+                "lastName", person.getLastName(),
+                "deletionDate", LocalDate.now().toString(),
+                "cartItemCount", "n/a"
+            )
         );
     }
 }

@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.gentlecorp.person.messaging.KafkaTopicProperties.TOPIC_NOTIFICATION_CUSTOMER_CREATED;
+import static com.gentlecorp.person.messaging.KafkaTopicProperties.TOPIC_NOTIFICATION_CUSTOMER_DELETED;
 import static com.gentlecorp.person.models.enums.PersonType.CUSTOMER;
 import static com.gentlecorp.person.models.enums.PersonType.EMPLOYEE;
 import static com.gentlecorp.person.models.enums.StatusType.ACTIVE;
@@ -118,7 +120,7 @@ public class PersonWriteService {
             Span kafkaSpan = tracer.spanBuilder("kafka.send-messages").startSpan();
             try (Scope kafkaScope = kafkaSpan.makeCurrent()) {
                 assert kafkaScope != null;
-                kafkaPublisherService.sendMail(savedCustomer, role);
+                kafkaPublisherService.sendMail(TOPIC_NOTIFICATION_CUSTOMER_CREATED,savedCustomer, role, false);
                 kafkaPublisherService.createAccount(savedCustomer.getId(), savedCustomer.getUsername());
                 kafkaPublisherService.createShoppingCart(savedCustomer.getId(),savedCustomer.getUsername());
             } catch (Exception e) {
@@ -245,6 +247,7 @@ public class PersonWriteService {
                 assert kafkaScope != null;
                 kafkaPublisherService.deleteShoppingCart(customerDb.getId());
                 kafkaPublisherService.deleteAccount(customerDb.getId(), customerDb.getVersion(), customerDb.getUsername());
+                kafkaPublisherService.sendMail(TOPIC_NOTIFICATION_CUSTOMER_DELETED,customerDb,null, true);
             } catch (Exception e) {
                 kafkaSpan.recordException(e);
                 kafkaSpan.setStatus(StatusCode.ERROR, "Fehler beim versenden der Nachrichten");

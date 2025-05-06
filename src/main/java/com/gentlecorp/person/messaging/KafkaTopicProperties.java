@@ -17,6 +17,7 @@ public final class KafkaTopicProperties {
 
     /** ✉️ Mailversand bei Kundenregistrierung */
     public static final String TOPIC_NOTIFICATION_CUSTOMER_CREATED = "notification.customer.created";
+    public static final String TOPIC_NOTIFICATION_CUSTOMER_DELETED = "notification.customer.deleted";
 
     /** 🏦 Kontoerstellung für neue Kunden */
     public static final String TOPIC_ACCOUNT_CREATED = "account.customer.created";
@@ -31,4 +32,5 @@ public final class KafkaTopicProperties {
 
     public static final String TOPIC_ACTIVITY_EVENTS = "activity.customer.log";
 
+    public static final String TOPIC_SYSTEM_SHUTDOWN = "system.shutdown";
 }

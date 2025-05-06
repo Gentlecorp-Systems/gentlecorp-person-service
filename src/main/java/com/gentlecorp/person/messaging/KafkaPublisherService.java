@@ -66,10 +66,14 @@ public class KafkaPublisherService {
     }
 
     @Observed(name = "kafka-publisher.send-mail")
-    public void sendMail(Person person, String role) {
-        final var mailDTO = SendMailEvent.fromEntity(person, role);
-        sendKafkaEvent(TOPIC_NOTIFICATION_CUSTOMER_CREATED, mailDTO, "sendMail");
+    public void sendMail(String topic, Person person, String role, boolean isDeleted) {
+        final var mailDTO = isDeleted
+            ? SendMailEvent.toDeleteEvent(person)
+            : SendMailEvent.toCreateEvent(person, role);
+
+        sendKafkaEvent(topic, mailDTO, "sendMail");
     }
+
 
     @Observed(name = "kafka-publisher.create-account")
     public void createAccount(UUID personId, String username) {
